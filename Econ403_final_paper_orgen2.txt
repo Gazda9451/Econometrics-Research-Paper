@@ -1,0 +1,296 @@
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\Tyler\Desktop\TYLER\School Work\RIT\2024 - Fall\ECON403 - Econmectics\Writing Assignment\Final Paper\Econ403_final_paper_orgen2.txt
+  log type:  text
+ opened on:   8 Dec 2024, 20:08:38
+
+. 
+. 
+. set more off
+
+. 
+. *keeps only Oregan  
+. keep if statefip == 41
+(3,197,473 observations deleted)
+
+. 
+. *keeps only people aged 18 to 20 and 27 to 29
+. keep if (age >= 27 & age <= 29) | (age >= 18 & age <= 20)
+(39,026 observations deleted)
+
+. 
+. *keeps only people who have atleast 1 year in college 
+. generate educ_high = educ >= 7 
+
+. 
+. *creates a dummy variable for after the act has pasted and its interaction term 
+. generate after = (age < 21)
+
+. label variable after "After"
+
+. label value after afterlib 
+
+. label define afterlib 0 "Before the Act" 1 "After the Act"
+
+. 
+. generate after_age = after*age
+
+. 
+. *creates a dummy variables for the race control 
+. generate white = race == 1
+
+. label variable white "white"
+
+. label value white whitelib 
+
+. label define whitelib 0 "Not White" 1 "White"
+
+. 
+. generate black = race == 2
+
+. label variable black "black"
+
+. label value black blacklib 
+
+. label define blacklib 0 "Not Black" 1 "Black"
+
+. 
+. generate native = race == 3
+
+. label variable native "Native"
+
+. label value native nativelib 
+
+. label define nativelib 0 "Not Native" 1 "Native"
+
+. 
+. generate asian = (race >= 4 & race <= 6)
+
+. label variable asian "Asian"
+
+. label value asian asianlib 
+
+. label define asianlib 0 "Not Asian" 1 "Asian"
+
+. 
+. generate other = (race >= 7 & race <= 9)
+
+. label variable other "Other"
+
+. label value other otherlib 
+
+. label define otherlib 0 "Not Other" 1 "Other"
+
+. 
+. *creates a dummy variables for the sex control 
+. generate male = sex == 1
+
+. label variable male "Male"
+
+. label value male malelib 
+
+. label define malelib 0 "Not Male" 1 "Male"
+
+. 
+. generate female = sex == 2
+
+. label variable female "Female"
+
+. label value female femalelib 
+
+. label define femalelib 0 "Not Female" 1 "Female"
+
+. 
+. *creates a dummy variables for the schooltype control 
+. generate public = schltype == 2
+
+. label variable public "Public"
+
+. label value public publiclib 
+
+. label define publiclib 0 "Not Public" 1 "Public"
+
+. 
+. generate private = schltype == 3
+
+. label variable private "Private"
+
+. label value private privatelib 
+
+. label define privatelib 0 "Not Private" 1 "Private"
+
+. 
+. *creates a dummy variables for the total income control 
+. generate over = hhincome >= 50000
+
+. label variable over "Over"
+
+. label value over overlib 
+
+. label define overlib 0 "Not Over 50,000 total family inc" 1 "Over 50,000 total family inc"
+
+. 
+. generate under = hhincome < 50000
+
+. label variable under "Under"
+
+. label value under underlib 
+
+. label define underlib 0 "Not Under 50,000 total family inc" 1 "Under 50,000 total family inc"
+
+. 
+. *regression with no controls 
+. reg educ_high after_age age after
+
+      Source |       SS           df       MS      Number of obs   =     3,054
+-------------+----------------------------------   F(3, 3050)      =    192.91
+       Model |  120.939746         3  40.3132488   Prob > F        =    0.0000
+    Residual |  637.361825     3,050   .20897109   R-squared       =    0.1595
+-------------+----------------------------------   Adj R-squared   =    0.1587
+       Total |  758.301572     3,053  .248379159   Root MSE        =    .45713
+
+------------------------------------------------------------------------------
+   educ_high | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   after_age |    .175923   .0201764     8.72   0.000     .1363622    .2154837
+         age |   .0395872   .0144867     2.73   0.006     .0111824    .0679919
+       after |  -3.276471   .4859704    -6.74   0.000    -4.229334   -2.323608
+       _cons |  -.4931884   .4064892    -1.21   0.225    -1.290209    .3038319
+------------------------------------------------------------------------------
+
+. 
+. *regression with race controls 
+. reg educ_high after_age age after white black asian native other 
+note: native omitted because of collinearity.
+
+      Source |       SS           df       MS      Number of obs   =     3,054
+-------------+----------------------------------   F(7, 3046)      =     88.22
+       Model |  127.826632         7  18.2609474   Prob > F        =    0.0000
+    Residual |   630.47494     3,046   .20698455   R-squared       =    0.1686
+-------------+----------------------------------   Adj R-squared   =    0.1667
+       Total |  758.301572     3,053  .248379159   Root MSE        =    .45496
+
+------------------------------------------------------------------------------
+   educ_high | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   after_age |   .1774726   .0200934     8.83   0.000     .1380747    .2168706
+         age |   .0383982   .0144255     2.66   0.008     .0101135    .0666829
+       after |  -3.316536   .4838691    -6.85   0.000    -4.265279   -2.367793
+       white |   .2221063   .0692122     3.21   0.001     .0863989    .3578136
+       black |   .1312506   .0903551     1.45   0.146    -.0459124    .3084137
+       asian |   .3398223   .0763765     4.45   0.000     .1900675    .4895771
+      native |          0  (omitted)
+       other |   .1434827    .073749     1.95   0.052    -.0011202    .2880855
+       _cons |  -.6768041   .4094167    -1.65   0.098    -1.479565    .1259568
+------------------------------------------------------------------------------
+
+. 
+. *regression with sex controls 
+. reg educ_high after_age age after male female 
+note: female omitted because of collinearity.
+
+      Source |       SS           df       MS      Number of obs   =     3,054
+-------------+----------------------------------   F(4, 3049)      =    167.31
+       Model |  136.484041         4  34.1210101   Prob > F        =    0.0000
+    Residual |  621.817531     3,049  .203941466   R-squared       =    0.1800
+-------------+----------------------------------   Adj R-squared   =    0.1789
+       Total |  758.301572     3,053  .248379159   Root MSE        =     .4516
+
+------------------------------------------------------------------------------
+   educ_high | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   after_age |   .1710707   .0199399     8.58   0.000     .1319738    .2101676
+         age |   .0400971   .0143114     2.80   0.005      .012036    .0681582
+       after |  -3.183911   .4802036    -6.63   0.000    -4.125467   -2.242356
+        male |  -.1428354   .0163607    -8.73   0.000    -.1749146   -.1107562
+      female |          0  (omitted)
+       _cons |   -.434116   .4016246    -1.08   0.280    -1.221598    .3533663
+------------------------------------------------------------------------------
+
+. 
+. *regression with schooltype controls
+. reg educ_high after_age age after public private 
+
+      Source |       SS           df       MS      Number of obs   =     3,054
+-------------+----------------------------------   F(5, 3048)      =    182.45
+       Model |   174.67771         5  34.9355419   Prob > F        =    0.0000
+    Residual |  583.623862     3,048  .191477645   R-squared       =    0.2304
+-------------+----------------------------------   Adj R-squared   =    0.2291
+       Total |  758.301572     3,053  .248379159   Root MSE        =    .43758
+
+------------------------------------------------------------------------------
+   educ_high | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   after_age |   .2006871   .0194888    10.30   0.000     .1624746    .2388997
+         age |   .0389076   .0138672     2.81   0.005     .0117177    .0660976
+       after |    -3.9445   .4690488    -8.41   0.000    -4.864184   -3.024816
+      public |   .2843717   .0211771    13.43   0.000     .2428489    .3258944
+     private |   .4550445   .0312988    14.54   0.000     .3936756    .5164133
+       _cons |   -.514605   .3891058    -1.32   0.186    -1.277541    .2483314
+------------------------------------------------------------------------------
+
+. 
+. *regression with income controls
+. reg educ_high after_age age after under over 
+note: over omitted because of collinearity.
+
+      Source |       SS           df       MS      Number of obs   =     3,054
+-------------+----------------------------------   F(4, 3049)      =    147.26
+       Model |  122.776286         4  30.6940714   Prob > F        =    0.0000
+    Residual |  635.525286     3,049  .208437286   R-squared       =    0.1619
+-------------+----------------------------------   Adj R-squared   =    0.1608
+       Total |  758.301572     3,053  .248379159   Root MSE        =    .45655
+
+------------------------------------------------------------------------------
+   educ_high | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   after_age |   .1801346   .0202005     8.92   0.000     .1405266    .2197426
+         age |   .0389001   .0144701     2.69   0.007      .010528    .0672722
+       after |  -3.365349    .486272    -6.92   0.000    -4.318803   -2.411895
+       under |  -.0602662   .0203031    -2.97   0.003    -.1000753   -.0204571
+        over |          0  (omitted)
+       _cons |  -.4596357    .406127    -1.13   0.258    -1.255946    .3366747
+------------------------------------------------------------------------------
+
+. 
+. *regession with all controls 
+. reg educ_high after_age age after white black asian native other male female public private under over 
+note: native omitted because of collinearity.
+note: female omitted because of collinearity.
+note: over omitted because of collinearity.
+
+      Source |       SS           df       MS      Number of obs   =     3,054
+-------------+----------------------------------   F(11, 3042)     =     92.93
+       Model |  190.729792        11   17.339072   Prob > F        =    0.0000
+    Residual |   567.57178     3,042  .186578494   R-squared       =    0.2515
+-------------+----------------------------------   Adj R-squared   =    0.2488
+       Total |  758.301572     3,053  .248379159   Root MSE        =    .43195
+
+------------------------------------------------------------------------------
+   educ_high | Coefficient  Std. err.      t    P>|t|     [95% conf. interval]
+-------------+----------------------------------------------------------------
+   after_age |   .1999999   .0193141    10.36   0.000     .1621298      .23787
+         age |   .0377081   .0136977     2.75   0.006     .0108503    .0645658
+       after |  -3.936576    .464344    -8.48   0.000    -4.847036   -3.026116
+       white |     .18492   .0657504     2.81   0.005     .0560003    .3138398
+       black |   .1253545   .0858627     1.46   0.144    -.0430003    .2937094
+       asian |   .2439407   .0728045     3.35   0.001     .1011898    .3866916
+      native |          0  (omitted)
+       other |   .1191973   .0700548     1.70   0.089    -.0181623    .2565569
+        male |   -.117617   .0157453    -7.47   0.000    -.1484895   -.0867446
+      female |          0  (omitted)
+      public |    .268122   .0209955    12.77   0.000     .2269551    .3092888
+     private |    .425801   .0312654    13.62   0.000     .3644976    .4871044
+       under |   -.057897   .0192227    -3.01   0.003    -.0955879   -.0202062
+        over |          0  (omitted)
+       _cons |  -.5831868   .3889528    -1.50   0.134    -1.345824    .1794502
+------------------------------------------------------------------------------
+
+. 
+. 
+. log cl
+      name:  <unnamed>
+       log:  C:\Users\Tyler\Desktop\TYLER\School Work\RIT\2024 - Fall\ECON403 - Econmectics\Writing Assignment\Final Paper\Econ403_final_paper_orgen2.txt
+  log type:  text
+ closed on:   8 Dec 2024, 20:08:39
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
